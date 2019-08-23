@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cSudokuServer", "cSudokuServer\cSudokuServer.csproj", "{938AF1BF-8660-4CDA-8834-C0D87452AFF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cSudokuClient", "cSudokuClient\cSudokuClient.csproj", "{DD2726FF-9C2D-43BC-B294-5CEEC027CC06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cSudokuCommonLib", "cSudokuCommonLib\cSudokuCommonLib.csproj", "{A316D17F-8D6F-4807-B9B5-090786F1A271}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cSudokuClientLib", "cSudokuClientLib\cSudokuClientLib.csproj", "{8E499971-D1EE-4787-8D81-5497571FBF9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cSudokuServerLib", "cSudokuServerLib\cSudokuServerLib.csproj", "{75E9DA20-B9A8-441F-84CC-350D202C57C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{938AF1BF-8660-4CDA-8834-C0D87452AFF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{938AF1BF-8660-4CDA-8834-C0D87452AFF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{938AF1BF-8660-4CDA-8834-C0D87452AFF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{938AF1BF-8660-4CDA-8834-C0D87452AFF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD2726FF-9C2D-43BC-B294-5CEEC027CC06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD2726FF-9C2D-43BC-B294-5CEEC027CC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD2726FF-9C2D-43BC-B294-5CEEC027CC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD2726FF-9C2D-43BC-B294-5CEEC027CC06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A316D17F-8D6F-4807-B9B5-090786F1A271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A316D17F-8D6F-4807-B9B5-090786F1A271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A316D17F-8D6F-4807-B9B5-090786F1A271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A316D17F-8D6F-4807-B9B5-090786F1A271}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E499971-D1EE-4787-8D81-5497571FBF9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E499971-D1EE-4787-8D81-5497571FBF9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E499971-D1EE-4787-8D81-5497571FBF9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E499971-D1EE-4787-8D81-5497571FBF9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75E9DA20-B9A8-441F-84CC-350D202C57C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75E9DA20-B9A8-441F-84CC-350D202C57C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75E9DA20-B9A8-441F-84CC-350D202C57C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75E9DA20-B9A8-441F-84CC-350D202C57C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		VisualSVNWorkingCopyRoot = .
+		SolutionGuid = {DF38D66E-536F-4973-8ABF-84FA06EF3B9A}
+	EndGlobalSection
+EndGlobal
