@@ -14,6 +14,7 @@ namespace cSudokuServer
         [STAThread]
         static void Main()
         {
+            // Определение прав, с которыми запущено приложение
             WindowsPrincipal pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
             bool hasAdministrativeRight = pricipal.IsInRole(WindowsBuiltInRole.Administrator);
 

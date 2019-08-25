@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
 [assembly: AssemblyTitle("cSudokuCommonLib")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Библиотека с общими элементами для серверной и клиентской частей игры CompetitiveSudoku")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("cSudokuCommonLib")]

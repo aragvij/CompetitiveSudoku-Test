@@ -5,20 +5,40 @@ namespace cSudokuServerLib
 {
     // Для генерации условия игры я использовал рассуждения, приведённые здесь: https://habr.com/ru/post/192102/
 
+    /// <summary>
+    /// Класс, реализующий логику игры
+    /// </summary>
     internal class GameSudoku
     {
+        /// <summary>
+        /// Сумма всех цисел в строке или столбце в правильно разгаданном судоку
+        /// </summary>
         private const int SumInLineIsWin = 45;
 
+        /// <summary>
+        /// Двумерный массив 9х9 клеток игры
+        /// </summary>
         private CSudokuCell[,] cellGrid;
+
+        /// <summary>
+        /// Генератор псевдослучайных числел, исопльзуется для создания начального условия игры
+        /// </summary>
         private readonly Random random;
 
+        /// <summary>
+        /// Уровень сложности, задаётся первым игроком
+        /// </summary>
         internal SudokuLevel GameLevel { get; set; }
 
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="level">Уровень сложности игры</param>
         public GameSudoku(SudokuLevel level)
         {
             /// <summary>
-            /// Таблица значений игры.
-            /// Начальное значение задано при создании экземпляра класса GameSudoku и всегда одинаково, оно меняется в конструкторе.
+            /// Таблица для создания условия новой игры.
+            /// Начальное значение всегда одинаково, оно меняется в методах Shuffle и ClearCells, и таким образом получается условие очередной игры.
             /// </summary>
             byte[,] grid =            {
             {1,2,3, 4,5,6, 7,8,9}, // +
@@ -37,9 +57,10 @@ namespace cSudokuServerLib
             //___|- первый вертикальный регион
             };
 
+            // Сохранение уровня сложности игры
             GameLevel = level;
 
-            // Счётчик псевдослучайных чисел, исопльзуется для генерации начального условия игры
+            // Задание начального значения для счётчика псевдослучайных чисел
             random = new Random(DateTime.Now.Hour * DateTime.Now.Minute * DateTime.Now.Second);
 
             // Перемешивание начальной таблицы
@@ -48,8 +69,15 @@ namespace cSudokuServerLib
             // Очистка случайных ячеек в зависимости от уровня: чем он меньше, тем меньше клеток очищаем
             ClearCells(ref grid);
 
+            // Перенос сформированного условия из массива байтов в ячейки игры
             FillSudokuCells(grid);
         }
+
+        /// <summary>
+        /// Возвращает текущее состояние игры, для передачи его игрокам.
+        /// </summary>
+        /// <param name="realGame">При false возвращает пустое поле. Используется для очистки поля у игрока, покинувшего турнир.</param>
+        /// <returns>Текущее состояние игры</returns>
         public CSudokuState GetGameState(bool realGame = true)
         {
             CSudokuCell[] array = new CSudokuCell[cellGrid.Length];
@@ -68,6 +96,13 @@ namespace cSudokuServerLib
                 Values = array
             };
         }
+
+        /// <summary>
+        /// Попытка хода игрока
+        /// </summary>
+        /// <param name="newCellValue">Ячейка с новым значением</param>
+        /// <param name="winnerId">Если в результате этого хода определился игрок, возвращаем его Id</param>
+        /// <returns>true, если этот ход может быть совершен, иначе false</returns>
         public bool TrySetValue(CSudokuCell newCellValue, out int? winnerId)
         {
             winnerId = null;
@@ -77,6 +112,7 @@ namespace cSudokuServerLib
                 return false;
             }
 
+            // Определение в серверной таблице изменяемой ячейки по координатам
             CSudokuCell serverCell = cellGrid[newCellValue.X, newCellValue.Y];
 
             if (serverCell.IsTask)
@@ -85,10 +121,10 @@ namespace cSudokuServerLib
                 return false;
             }
 
+            // Нельзя допустить, чтобы два хода произошли одновременно
             lock (cellGrid)
             {
-                // Можно поставить значение в ошибочную ячейку, или в пустую или ту, в которой значение было установлено этим же игроком
-
+                // Можно поставить значение в ошибочную ячейку, или в пустую или ту, в которой значение было установлено этим же игроком, в противном случае ход не происходит
                 if (serverCell.Error ||
                     null == serverCell.Owner ||
                     newCellValue.Owner == serverCell.Owner)
@@ -101,17 +137,18 @@ namespace cSudokuServerLib
                     }
                     else
                     {
-                        // В ячейку поставлено реальное значение
+                        // В ячейку поставлено реальное значение, она помечается занятой этим игроком
                         serverCell.Owner = newCellValue.Owner;
                         serverCell.Value = newCellValue.Value;
 
                         if (TestForWin())
                         {
-                            // игра окончена
+                            // Игра окончена, победитель определён
                             winnerId = newCellValue.Owner;
                         }
                     }
 
+                    // Пометка ошибочных ячеек: тех, которые имеют значение такое же, как и устанавливаемое значение, и находятся в той же строке, столбце или регионе. В ошибочную ячейку пожет поставить своё значение другой игрок.
                     TestForError(serverCell);
                     return true;
                 }
@@ -140,6 +177,7 @@ namespace cSudokuServerLib
 
                     if (grid[i, j] > 0)
                     {
+                        // Пометка ячейки со значением как "принадлежащей серверу". В неё не может поставить своё значение никакой игрок.
                         cellGrid[i, j].Owner = CSudokuCell.ServerId;
                     }
                 }
@@ -152,6 +190,7 @@ namespace cSudokuServerLib
         /// </summary>
         private void ClearCells(ref byte[,] grid)
         {
+            // Уровень сложности игры
             int delete10 = (int)GameLevel;
             if (delete10 > 7)
             {
@@ -159,10 +198,11 @@ namespace cSudokuServerLib
                 GameLevel = SudokuLevel.простейший;
             }
 
-            // 
+            // Очистка случайной ячейки из всего набора
             int index, x, y;
             for (int i = 0; i < delete10 * 10; i++)
             {
+                // Выбор случайной не пустой ячейки
                 do
                 {
                     index = random.Next(81);
@@ -171,7 +211,7 @@ namespace cSudokuServerLib
                 }
                 while (grid[x, y] == 0);
 
-                // очистка ячейки
+                // Очистка ячейки
                 grid[x, y] = 0;
             }
         }
@@ -181,25 +221,30 @@ namespace cSudokuServerLib
         /// </summary>
         private void Shuffle(ref byte[,] grid)
         {
-            // производим от 50 до 100 случайных итераций перемешивания
+            // Производим от 50 до 100 случайных итераций перемешивания
             int num = random.Next(51) + 50;
             for (int i = 0; i < num; i++)
             {
                 switch (random.Next(5))
                 {
                     case 0:
+                        // Перестановка строк
                         SwapRows(ref grid);
                         continue;
                     case 1:
+                        // Перестановка столбцов
                         SwapColums(ref grid);
                         continue;
                     case 2:
+                        // Перестановка горизонтальных регионов
                         SwapRegionRow(ref grid);
                         continue;
                     case 3:
+                        // Перестановка вертикальных регионов
                         SwapRegionCol(ref grid);
                         continue;
                     default:
+                        // Транспонирование таблицы
                         Transposing(ref grid);
                         break;
                 }
@@ -216,6 +261,7 @@ namespace cSudokuServerLib
             {
                 for (int j = 0; j < 9; j++)
                 {
+                    // Обмен строк со столбцами
                     newGrid[i, j] = grid[j, i];
                 }
             }
@@ -227,7 +273,7 @@ namespace cSudokuServerLib
         /// </summary>
         private void SwapRows(ref byte[,] grid)
         {
-            // горизонтальный регион 0..2
+            // Горизонтальный регион 0..2
             int region = random.Next(3);
 
             // 1-я строка в регионе
@@ -240,11 +286,11 @@ namespace cSudokuServerLib
                 N2 = random.Next(3);
             }
 
-            // номера строк в таблице
+            // Номера строк в таблице
             N1 = region * 3 + N1;
             N2 = region * 3 + N2;
 
-            // цикл по столбцам таблицы
+            // Цикл обмена строк по столбцам таблицы
             SwapTwoLine(N1, N2, grid);
         }
 
@@ -265,10 +311,11 @@ namespace cSudokuServerLib
         /// <summary>
         /// Обмен местами двух ячеек таблицы
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="x">Номер столбца</param>
+        /// <param name="y">Номер строки</param>
         private void SwapTwoByte(ref byte x, ref byte y)
         {
+            // Обмен значениями
             x = (byte)(x ^ y);
             y = (byte)(x ^ y);
             x = (byte)(x ^ y);
@@ -289,7 +336,7 @@ namespace cSudokuServerLib
                 R2 = random.Next(3);
             }
 
-            // Обмен местами каждой строки в реионах
+            // Обмен местами каждой из трёх строк в регионах
             for (int i = 0; i < 3; i++)
             {
                 SwapTwoLine(R1 * 3 + i, R2 * 3 + i, grid);
@@ -301,8 +348,13 @@ namespace cSudokuServerLib
         /// </summary>
         private void SwapColums(ref byte[,] grid)
         {
+            // Транспонирование
             Transposing(ref grid);
+
+            // Обмен строк
             SwapRows(ref grid);
+
+            // Транспонирование
             Transposing(ref grid);
         }
 
@@ -311,39 +363,54 @@ namespace cSudokuServerLib
         /// </summary>
         private void SwapRegionCol(ref byte[,] grid)
         {
+            // Транспонирование
             Transposing(ref grid);
+
+            // Обмен горизонтальных регионов
             SwapRegionRow(ref grid);
+
+            // Транспонирование
             Transposing(ref grid);
         }
+
+        /// <summary>
+        /// Проверка нового значения в ячейки на то, что оно - ошибочно. Ошибочные ячейки помечаются.
+        /// </summary>
+        /// <param name="testingCell">Проверяемая ячейка</param>
         private void TestForError(CSudokuCell testingCell)
         {
             for (int i = 0; i < 9; i++)
             {
-                // проверка по строке
+                // Проверка по строке
                 if (i != testingCell.Y)
                 {
                     cellGrid[testingCell.X, i].TestError(testingCell);
                 }
 
-                // проверка по столбцу
+                // Проверка по столбцу
                 if (i != testingCell.X)
                 {
                     cellGrid[i, testingCell.Y].TestError(testingCell);
                 }
             }
 
-            // проверка по региону 3х3
+            // Проверка по региону 3х3
+
+            // Определение "координат" региона
             int regX = testingCell.X / 3;
             int regY = testingCell.Y / 3;
 
             for (int x = 0; x < 3; x++)
             {
+                // Координата Х проверяемой ячейки в регионе
                 int realX = regX * 3 + x;
 
                 for (int y = 0; y < 3; y++)
                 {
+                    // Координата Y проверяемой ячейки в регионе
                     int realY = regY * 3 + y;
 
+                    // Не сравниваем ячейку саму с собой
                     if (realX != testingCell.X || realY != testingCell.Y)
                     {
                         cellGrid[realX, realY].TestError(testingCell);
@@ -351,6 +418,11 @@ namespace cSudokuServerLib
                 }
             }
         }
+
+        /// <summary>
+        /// Проверка факта успешного окончания игры (решения судоку)
+        /// </summary>
+        /// <returns></returns>
         private bool TestForWin()
         {
             int sumX, sumY;
@@ -361,17 +433,21 @@ namespace cSudokuServerLib
                 sumY = 0;
                 for (int y = 0; y < 9; y++)
                 {
-                    // сумма цифр в столбце
+                    // Сумма цифр в столбце
                     sumX += cellGrid[x, y].Value;
-                    // сумма цифр в строке
+                    // Сумма цифр в строке
                     sumY += cellGrid[y, x].Value;
                 }
+
+                // Если сумма цифр не равна 45, то судоку не решено правильно
                 if (sumX != SumInLineIsWin ||
                     sumY != SumInLineIsWin)
                 {
                     return false;
                 }
             }
+
+            // Судоку решено
             return true;
         }
     }

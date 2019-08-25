@@ -3,3 +3,15 @@
 ################################################################################
 
 /.vs/CompetitiveSudoku-Test/v16/Server/sqlite3
+/.vs/CompetitiveSudoku-Test/v16
+/.vs
+/cSudokuClient/bin/Debug
+/cSudokuClient/obj
+/cSudokuClientLib/bin/Debug
+/cSudokuClientLib/obj
+/cSudokuCommonLib/bin/Debug
+/cSudokuCommonLib/obj
+/cSudokuServer/bin/Debug
+/cSudokuServer/obj
+/cSudokuServerLib/bin/Debug
+/cSudokuServerLib/obj
