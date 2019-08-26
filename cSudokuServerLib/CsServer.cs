@@ -299,15 +299,20 @@ namespace cSudokuServerLib
                         ShowPlayerList(playerList.GetPlayerList());
                     }
                     else
-                    if (!string.IsNullOrEmpty(errorMessage))
                     {
-                        // Если добавление игрока не произошло удачно, игру не начинаем. Выводим сообщение об ошибке.
-                        await SendMessage(clentSocket, new SocketMessage
+                        if (!string.IsNullOrEmpty(errorMessage))
                         {
-                            messageType = MessageType.Error,
-                            text = errorMessage,
-                        });
-                        break;
+                            // Если добавление игрока не произошло удачно, игру не начинаем. Выводим сообщение об ошибке.
+                            await SendMessage(clentSocket, new SocketMessage
+                            {
+                                messageType = MessageType.Error,
+                                text = errorMessage,
+                            });
+                            break;
+                        }
+
+                        // Возврат игрока в чемпионат
+                        playerList.GetPlayerById(playerId).InGame = true;
                     }
 
                     if (null == game)
